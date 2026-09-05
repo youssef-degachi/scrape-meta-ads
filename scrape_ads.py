@@ -491,7 +491,7 @@ def write_xlsx(results, pages, path):
 
 def slugify(s):
     s = re.sub(r"[^\w\s-]", "", s, flags=re.U).strip().lower()
-    return re.sub(r"[\s_-]+", "_", s) or "collection"
+    return re.sub(r"\s+", "_", s) or "collection"
 
 
 def default_name(url):
