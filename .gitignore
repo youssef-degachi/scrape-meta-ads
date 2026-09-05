@@ -1,0 +1,23 @@
+# python
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# node
+node_modules/
+
+# scraped data, logs, debug dumps (generated, can be large / contain contacts)
+data/
+dumps/
+*.log
+*.xlsx
+*.csv
+
+# saved facebook page used during development
+code.html
+
+# editors / os
+.vscode/
+.idea/
+.DS_Store

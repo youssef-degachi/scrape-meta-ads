@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ads Leads</title>
+<style>
+  :root {
+    --bg: #f5f6f8; --card: #fff; --text: #1c2431; --muted: #6b7280; --line: #e5e7eb;
+    --accent: #1f4e78; --wa: #128c7e; --gray-bg: #e9eaee; --gray-text: #8a8f99;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; font: 14px/1.45 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: var(--bg); color: var(--text); }
+  header { background: var(--accent); color: #fff; padding: 12px 20px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  header h1 { font-size: 18px; margin: 0; font-weight: 600; }
+  header select, header input[type=search] { padding: 6px 10px; border-radius: 6px; border: 1px solid #ffffff55; font-size: 14px; }
+  header input[type=search] { min-width: 260px; }
+  header label { display: flex; gap: 6px; align-items: center; font-size: 13px; cursor: pointer; }
+  .stats { margin-left: auto; font-size: 13px; opacity: .9; }
+  main { padding: 16px 20px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+  .tabs button { padding: 7px 14px; border: 1px solid var(--line); background: var(--card); border-radius: 6px; cursor: pointer; font-size: 14px; }
+  .tabs button.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .wrap { background: var(--card); border: 1px solid var(--line); border-radius: 8px; overflow: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; }
+  th { background: #f9fafb; position: sticky; top: 0; font-weight: 600; font-size: 13px; color: var(--muted); white-space: nowrap; cursor: pointer; user-select: none; }
+  th.sorted::after { content: " ▾"; }
+  th.sorted.asc::after { content: " ▴"; }
+  tr.contacted td { background: var(--gray-bg); color: var(--gray-text); }
+  tr.contacted a { color: var(--gray-text); }
+  tr.contacted .pill { opacity: .55; }
+  td.name { font-weight: 600; min-width: 200px; }
+  td.name small { display: block; font-weight: 400; color: var(--muted); }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; margin: 1px 3px 1px 0; white-space: nowrap; text-decoration: none; }
+  .pill.wa { background: #e6f7f3; color: var(--wa); border: 1px solid #b9e6dc; }
+  .pill.ph { background: #eef2ff; color: #3b4fb8; border: 1px solid #c7d2fe; }
+  .pill.em { background: #fff4e5; color: #b45309; border: 1px solid #fcd9a8; }
+  .pill.ln { background: #f3f4f6; color: #374151; border: 1px solid var(--line); max-width: 260px; overflow: hidden; text-overflow: ellipsis; vertical-align: bottom; }
+  a { color: var(--accent); }
+  input[type=checkbox] { width: 18px; height: 18px; cursor: pointer; }
+  textarea.note { width: 180px; min-height: 34px; font: inherit; font-size: 13px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 4px; resize: vertical; }
+  .rtl { direction: rtl; unicode-bidi: plaintext; text-align: right; }
+  td.body { max-width: 380px; white-space: pre-wrap; font-size: 13px; max-height: 120px; overflow: auto; display: block; }
+  .expand { cursor: pointer; color: var(--accent); font-size: 12px; text-decoration: underline; }
+  tr.adrow td { background: #fbfbfd; font-size: 13px; }
+  .empty { padding: 40px; text-align: center; color: var(--muted); }
+  .count { color: var(--muted); font-weight: 400; }
+  img.thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
+  /* collections screen */
+  #home { max-width: 1000px; margin: 0 auto; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 16px 20px; margin-bottom: 16px; }
+  .card h2 { margin: 0 0 12px; font-size: 16px; }
+  .form { display: grid; grid-template-columns: 1fr 220px 110px auto; gap: 10px; align-items: center; }
+  .form input[type=text] { padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 14px; width: 100%; }
+  .form button, .btn { padding: 8px 16px; background: var(--accent); color: #fff; border: 0; border-radius: 6px; cursor: pointer; font-size: 14px; }
+  .btn.secondary { background: #fff; color: var(--accent); border: 1px solid var(--accent); }
+  .form .hint { grid-column: 1 / -1; color: var(--muted); font-size: 12px; }
+  .coll { display: grid; grid-template-columns: 1fr auto auto auto; gap: 14px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .coll:last-child { border-bottom: 0; }
+  .coll .title { font-weight: 600; font-size: 15px; }
+  .coll .sub { color: var(--muted); font-size: 12px; margin-top: 2px; word-break: break-all; }
+  .coll .nums { color: var(--muted); font-size: 13px; white-space: nowrap; }
+  .status { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; }
+  .status.done { background: #e6f7f3; color: var(--wa); }
+  .status.running { background: #fff4e5; color: #b45309; }
+  .status.error { background: #fee2e2; color: #b91c1c; }
+  .back { color: #fff; text-decoration: none; opacity: .9; font-size: 13px; }
+  .err { color: #b91c1c; font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ads Leads</h1>
+  <a href="#" id="back" class="back" hidden>← All collections</a>
+  <select id="dataset" title="Collection" hidden></select>
+  <a id="dl" class="back" href="#" hidden>⬇ Excel</a>
+  <input id="q" type="search" placeholder="Search name, number, email, text…" hidden>
+  <label id="lblHide" hidden><input id="hideContacted" type="checkbox"> Hide contacted</label>
+  <label id="lblOnly" hidden><input id="onlyContacts" type="checkbox"> Only with WhatsApp / phone / email</label>
+  <span class="stats" id="stats"></span>
+</header>
+<main>
+  <div id="home">
+    <div class="card">
+      <h2>New scrape</h2>
+      <div class="form">
+        <input type="text" id="newUrl" placeholder="Paste a Facebook Ads Library URL (https://www.facebook.com/ads/library/?...&q=Dental%20Clinic...)">
+        <input type="text" id="newName" placeholder="Collection name (optional)">
+        <input type="text" id="newMax" placeholder="Max ads" value="2000">
+        <button id="startScrape">Start scrape</button>
+        <div class="hint">Runs in the background. Each collection is saved in its own folder under <code>data/</code> with JSON, CSV and Excel. Refresh to see progress. <span id="newErr" class="err"></span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Collections</h2>
+      <div id="collList" class="empty">Loading…</div>
+    </div>
+  </div>
+  <div id="leads" hidden>
+  <div class="tabs">
+    <button id="tabPages" class="active">Advertisers</button>
+    <button id="tabAds">All ads</button>
+  </div>
+  <div class="wrap"><div id="content" class="empty">Loading…</div></div>
+  </div>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+let ads = [], pages = [], state = {}, view = 'pages', sortKey = 'ads_count', sortAsc = false;
+const hasArabic = s => /[؀-ۿ]/.test(s || '');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const keyOf = p => p.page_id || p.page_url || p.page_name;
+
+async function api(path, opts) {
+  try {
+    const r = await fetch(path, opts);
+    const ct = r.headers.get('content-type') || '';
+    if (!ct.includes('json')) throw new Error('no api');
+    return await r.json();
+  } catch (e) {
+    document.body.innerHTML = `<div style="max-width:640px;margin:80px auto;font-family:system-ui;line-height:1.6">
+      <h2>Backend not running</h2>
+      <p>This page needs the Python server, so opening it from Live Server or as a file will stay empty.</p>
+      <p>In the project folder run:</p>
+      <pre style="background:#f3f4f6;padding:12px;border-radius:6px">./start.sh</pre>
+      <p>then open <a href="http://localhost:8000">http://localhost:8000</a>.</p></div>`;
+    throw e;
+  }
+}
+
+let collections = [], current = null, pollTimer = null;
+
+function showHome() {
+  current = null; location.hash = '';
+  $('#home').hidden = false; $('#leads').hidden = true;
+  for (const id of ['back','dataset','dl','q','lblHide','lblOnly']) $('#' + id).hidden = true;
+  $('#stats').textContent = '';
+  loadCollections();
+}
+function showLeads(name) {
+  $('#home').hidden = true; $('#leads').hidden = false;
+  for (const id of ['back','dataset','dl','q','lblHide','lblOnly']) $('#' + id).hidden = false;
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  loadData(name);
+}
+
+async function loadCollections() {
+  collections = await api('/api/collections');
+  const sel = $('#dataset');
+  sel.innerHTML = collections.filter(c => c.has_data).map(c => `<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
+  const box = $('#collList');
+  if (!collections.length) { box.innerHTML = '<div class="empty">No collections yet. Paste an Ads Library URL above to start one.</div>'; return; }
+  box.className = '';
+  box.innerHTML = collections.map(c => {
+    const st = c.status || 'done';
+    const kw = (() => { try { return new URL(c.url).searchParams.get('q'); } catch { return ''; } })();
+    const country = (() => { try { return new URL(c.url).searchParams.get('country'); } catch { return ''; } })();
+    return `<div class="coll">
+      <div><div class="title">${esc(c.name)} <span class="status ${st}">${st}</span></div>
+        <div class="sub">${kw ? esc(kw) + (country ? ' · ' + esc(country) : '') + ' · ' : ''}${esc(c.started || '')}${st === 'running' && c.progress ? ' · ' + esc(c.progress) : ''}${c.error ? ' · ' + esc(c.error) : ''}</div></div>
+      <div class="nums">${c.has_data ? `${c.pages ?? '?'} advertisers · ${c.ads ?? '?'} ads<br>WhatsApp ${c.ads_with_whatsapp ?? '-'} · phone ${c.ads_with_phone ?? '-'} · email ${c.ads_with_email ?? '-'}` : ''}</div>
+      <div>${c.xlsx ? `<a class="btn secondary" href="${esc(c.xlsx)}">⬇ Excel</a>` : ''}</div>
+      <div>${c.has_data ? `<button class="btn open" data-name="${esc(c.name)}">Open</button>` : ''}</div>
+    </div>`;
+  }).join('');
+  const running = collections.some(c => c.status === 'running');
+  if (running && !pollTimer) pollTimer = setInterval(loadCollections, 4000);
+  if (!running && pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+}
+
+async function loadData(name) {
+  current = name; location.hash = name;
+  $('#dataset').value = name;
+  const c = collections.find(x => x.name === name);
+  $('#dl').href = c?.xlsx || '#'; $('#dl').hidden = !c?.xlsx;
+  const [d, st] = await Promise.all([api('/api/data?name=' + encodeURIComponent(name)), api('/api/contacted')]);
+  if (d.error) { showHome(); return; }
+  ads = d.ads || []; pages = d.pages || []; state = st || {};
+  render();
+}
+
+$('#collList').addEventListener('click', e => { const b = e.target.closest('.open'); if (b) showLeads(b.dataset.name); });
+$('#back').addEventListener('click', e => { e.preventDefault(); showHome(); });
+$('#startScrape').addEventListener('click', async () => {
+  const url = $('#newUrl').value.trim(), name = $('#newName').value.trim(), max_ads = parseInt($('#newMax').value) || 2000;
+  $('#newErr').textContent = '';
+  if (!url) { $('#newErr').textContent = 'Paste a URL first.'; return; }
+  const r = await api('/api/scrape', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url, name, max_ads }) });
+  if (r.error) { $('#newErr').textContent = r.error; return; }
+  $('#newUrl').value = ''; $('#newName').value = '';
+  loadCollections();
+});
+
+async function boot() {
+  await loadCollections();
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (h && collections.some(c => c.name === h && c.has_data)) showLeads(h); else showHome();
+}
+
+function pills(p) {
+  let h = '';
+  (p.whatsapp_numbers || []).forEach(n => h += `<a class="pill wa" target="_blank" href="https://wa.me/${n.replace('+','')}">💬 ${esc(n)}</a>`);
+  (p.phone_numbers || []).forEach(n => h += `<a class="pill ph" href="tel:${esc(n)}">📞 ${esc(n)}</a>`);
+  (p.about_phones || []).filter(n => !(p.phone_numbers||[]).includes(n) && !(p.whatsapp_numbers||[]).includes(n))
+    .forEach(n => h += `<a class="pill ph" href="tel:${esc(n)}">📞 ${esc(n)}</a>`);
+  [...new Set([...(p.emails || []), ...(p.about_emails || [])])].forEach(e => h += `<a class="pill em" href="mailto:${esc(e)}">✉ ${esc(e)}</a>`);
+  return h || '<span class="count">—</span>';
+}
+function links(p) {
+  const all = [...new Set([...(p.external_links || []), ...(p.about_websites || [])])];
+  return all.slice(0, 6).map(u => `<a class="pill ln" target="_blank" href="${esc(u)}" title="${esc(u)}">${esc(u.replace(/^https?:\/\/(www\.)?/, ''))}</a>`).join('')
+    + (all.length > 6 ? `<span class="count">+${all.length - 6}</span>` : '') || '<span class="count">—</span>';
+}
+function hasContact(p) {
+  return (p.whatsapp_numbers||[]).length || (p.phone_numbers||[]).length || (p.emails||[]).length
+      || (p.about_phones||[]).length || (p.about_emails||[]).length;
+}
+function matches(obj, q) {
+  if (!q) return true;
+  return JSON.stringify(obj).toLowerCase().includes(q);
+}
+
+function render() {
+  const q = $('#q').value.trim().toLowerCase();
+  const hide = $('#hideContacted').checked, only = $('#onlyContacts').checked;
+  const contactedCount = pages.filter(p => state[keyOf(p)]?.contacted).length;
+  $('#stats').textContent = `${pages.length} advertisers · ${ads.length} ads · ${contactedCount} contacted`;
+  view === 'pages' ? renderPages(q, hide, only) : renderAds(q, hide, only);
+}
+
+function sortBy(list, key) {
+  return [...list].sort((a, b) => {
+    let x = a[key], y = b[key];
+    if (Array.isArray(x)) x = x.length; if (Array.isArray(y)) y = y.length;
+    if (x == null) x = ''; if (y == null) y = '';
+    const c = typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y));
+    return sortAsc ? c : -c;
+  });
+}
+
+function th(label, key) {
+  return `<th data-key="${key}" class="${sortKey === key ? 'sorted' + (sortAsc ? ' asc' : '') : ''}">${label}</th>`;
+}
+
+function renderPages(q, hide, only) {
+  let list = pages.filter(p => matches(p, q));
+  if (hide) list = list.filter(p => !state[keyOf(p)]?.contacted);
+  if (only) list = list.filter(hasContact);
+  list = sortBy(list, sortKey);
+  if (!list.length) { $('#content').innerHTML = '<div class="empty">Nothing matches.</div>'; return; }
+  let h = `<table><thead><tr><th>✓</th>${th('Advertiser', 'page_name')}${th('Ads', 'ads_count')}${th('Contacts', 'whatsapp_numbers')}<th>Links</th>${th('Likes', 'page_likes')}<th>Note</th></tr></thead><tbody>`;
+  for (const p of list) {
+    const k = keyOf(p), st = state[k] || {}, c = st.contacted;
+    h += `<tr class="${c ? 'contacted' : ''}" data-key="${esc(k)}">
+      <td><input type="checkbox" class="ck" ${c ? 'checked' : ''} title="Mark contacted"></td>
+      <td class="name ${hasArabic(p.page_name) ? 'rtl' : ''}"><a target="_blank" href="${esc(p.page_url)}">${esc(p.page_name)}</a>
+        <small>${esc((p.page_categories||[]).join(', '))}${p.instagram_handle ? ' · IG @' + esc(p.instagram_handle) : ''}</small>
+        <span class="expand" data-expand="${esc(k)}">show ${p.ads_count} ad${p.ads_count > 1 ? 's' : ''}</span>
+        ${st.when ? `<small>contacted ${esc(st.when)}</small>` : ''}</td>
+      <td>${p.ads_count}</td>
+      <td>${pills(p)}</td>
+      <td>${links(p)}</td>
+      <td>${p.page_likes ?? ''}</td>
+      <td><textarea class="note" placeholder="note…">${esc(st.note || '')}</textarea></td>
+    </tr>`;
+  }
+  $('#content').innerHTML = h + '</tbody></table>';
+}
+
+function adRow(a, c) {
+  const txt = [a.title, a.body, a.link_description, ...(a.card_texts||[])].filter(Boolean).join('\n');
+  return `<tr class="adrow ${c ? 'contacted' : ''}">
+    <td>${a.images?.[0] ? `<img class="thumb" src="${esc(a.images[0])}" loading="lazy">` : (a.videos?.length ? '🎬' : '')}</td>
+    <td class="name ${hasArabic(a.page_name) ? 'rtl' : ''}"><a target="_blank" href="${esc(a.page_url)}">${esc(a.page_name)}</a>
+      <small><a target="_blank" href="${esc(a.ad_library_url)}">ad ${esc(a.ad_archive_id)}</a> · ${esc(a.start_date || '')} → ${esc(a.end_date || '')}<br>${esc((a.platforms||[]).join(', '))}</small></td>
+    <td><span class="pill ln">${esc(a.cta_type || '')}</span><br>${a.link_url ? `<a class="pill ln" target="_blank" href="${esc(a.link_url)}">${esc(a.link_url.replace(/^https?:\/\/(www\.)?/, '').slice(0, 50))}</a>` : ''}</td>
+    <td>${pills(a)}</td>
+    <td><div class="body ${hasArabic(txt) ? 'rtl' : ''}">${esc(txt)}</div></td>
+  </tr>`;
+}
+
+function renderAds(q, hide, only) {
+  let list = ads.filter(a => matches(a, q));
+  if (hide) list = list.filter(a => !state[keyOf(a)]?.contacted);
+  if (only) list = list.filter(hasContact);
+  if (!list.length) { $('#content').innerHTML = '<div class="empty">Nothing matches.</div>'; return; }
+  let h = `<table><thead><tr><th></th><th>Advertiser / ad</th><th>CTA / link</th><th>Contacts</th><th>Text</th></tr></thead><tbody>`;
+  for (const a of list) h += adRow(a, state[keyOf(a)]?.contacted);
+  $('#content').innerHTML = h + '</tbody></table>';
+}
+
+async function setContacted(key, contacted, tr) {
+  const when = contacted ? new Date().toISOString().slice(0, 10) : null;
+  state[key] = { ...(state[key] || {}), contacted, when };
+  tr.classList.toggle('contacted', contacted);
+  await api('/api/contacted', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key, contacted, when }) });
+  const contactedCount = pages.filter(p => state[keyOf(p)]?.contacted).length;
+  $('#stats').textContent = `${pages.length} advertisers · ${ads.length} ads · ${contactedCount} contacted`;
+  if ($('#hideContacted').checked && contacted) setTimeout(() => tr.remove(), 400);
+}
+
+$('#content').addEventListener('change', e => {
+  const tr = e.target.closest('tr'); if (!tr) return;
+  if (e.target.classList.contains('ck')) setContacted(tr.dataset.key, e.target.checked, tr);
+  if (e.target.classList.contains('note')) {
+    const key = tr.dataset.key, note = e.target.value;
+    state[key] = { ...(state[key] || {}), note };
+    api('/api/contacted', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key, note }) });
+  }
+});
+$('#content').addEventListener('click', e => {
+  const th = e.target.closest('th[data-key]');
+  if (th) { const k = th.dataset.key; if (sortKey === k) sortAsc = !sortAsc; else { sortKey = k; sortAsc = false; } render(); return; }
+  const ex = e.target.closest('.expand');
+  if (ex) {
+    const tr = ex.closest('tr'), key = ex.dataset.expand;
+    let next = tr.nextElementSibling;
+    if (next && next.classList.contains('adrow')) { while (next && next.classList.contains('adrow')) { const n = next.nextElementSibling; next.remove(); next = n; } return; }
+    const c = state[key]?.contacted;
+    const rows = ads.filter(a => keyOf(a) === key).map(a => adRow(a, c)).join('');
+    tr.insertAdjacentHTML('afterend', rows);
+  }
+});
+$('#q').addEventListener('input', render);
+$('#hideContacted').addEventListener('change', render);
+$('#onlyContacts').addEventListener('change', render);
+$('#dataset').addEventListener('change', e => loadData(e.target.value));
+$('#tabPages').addEventListener('click', () => { view = 'pages'; $('#tabPages').classList.add('active'); $('#tabAds').classList.remove('active'); render(); });
+$('#tabAds').addEventListener('click', () => { view = 'ads'; $('#tabAds').classList.add('active'); $('#tabPages').classList.remove('active'); render(); });
+boot();
+</script>
+</body>
+</html>
