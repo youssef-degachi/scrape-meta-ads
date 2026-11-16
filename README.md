@@ -56,3 +56,24 @@ Each scrape is a folder in `data/<name>/`: `ads.json`, `pages.json`, `ads.csv`, 
 
 Quote the URL. Flags: `--max-ads N`, `--headed` (show browser), `--no-enrich` (faster, leads from the ads only), `--deep` (also read each page's
 About tab for phone / email / website, slow).
+
+
+## Example of result
+# LG Home Comfort
+
+```
+Website: https://xxx.ca/
+Facebook: https://www.facebook.com/xx/
+Instagram: https://www.instagram.com/xx
+
+Whatsapp:
+
+Phone: +xxx
+
+Other:
+https://x.com/xx
+https://www.linkedin.com/company/xx/
+https://www.youtube.com/@xx/
+https://www.tiktok.com/@xx/
+Video:
+```
