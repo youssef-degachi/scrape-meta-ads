@@ -35,6 +35,84 @@ Ads Library URL
                    browse leads, tick "contacted" (row turns gray), download Excel / leads.md
 ```
 
+## What the result looks like
+
+All names, numbers and links below are made up.
+
+**1. The website** (`http://localhost:8000`): one row per advertiser. Tick the box after you contact them and the row turns gray (saved in `data/contacted.json`).
+
+| Done | Business | Ads | Website | WhatsApp | Phone | Facebook |
+|---|---|---|---|---|---|---|
+| [ ] | Sunrise Dental | 4 | sunrisedental.example | +965 5000 0000 | +965 2200 0000 | facebook.com/SunriseDental |
+| [x] | Bright Smile Clinic | 2 | brightsmile.example | | +965 2255 0000 | facebook.com/BrightSmile |
+
+**2. `leads.md`**: one block per advertiser, ready to copy into a CRM or notes app.
+
+````
+# Sunrise Dental
+
+```
+Website: https://sunrisedental.example/
+
+
+Facebook: https://www.facebook.com/SunriseDental/
+
+
+Instagram: https://www.instagram.com/sunrisedental
+
+
+Whatsapp: +96550000000
+
+Phone: +96522000000
+
+Other:
+https://www.tiktok.com/@sunrisedental
+info@sunrisedental.example
+Video:
+```
+````
+
+**3. `pages.json`**: one object per advertiser (also exported as `pages.csv` and the Excel sheet).
+
+```json
+{
+  "page_id": "262170691438369",
+  "page_name": "Sunrise Dental",
+  "page_url": "https://www.facebook.com/SunriseDental/",
+  "page_likes": 6170,
+  "page_categories": ["Dentist & Dental Office"],
+  "instagram_handle": "sunrisedental",
+  "ads_count": 4,
+  "whatsapp_numbers": ["+96550000000"],
+  "phone_numbers": ["+96522000000"],
+  "emails": ["info@sunrisedental.example"],
+  "external_links": ["https://sunrisedental.example/"]
+}
+```
+
+**4. `ads.json`**: one object per ad, with the full detail.
+
+```json
+{
+  "ad_archive_id": "1516871603363521",
+  "ad_library_url": "https://www.facebook.com/ads/library/?id=1516871603363521",
+  "page_name": "Sunrise Dental",
+  "is_active": true,
+  "start_date": "2025-10-03",
+  "platforms": ["FACEBOOK", "INSTAGRAM"],
+  "display_format": "VIDEO",
+  "title": "Free first check-up this month",
+  "body": "Book now on WhatsApp ...",
+  "cta_text": "Send message",
+  "link_url": "https://wa.me/96550000000",
+  "whatsapp_numbers": ["+96550000000"],
+  "phone_numbers": [],
+  "emails": [],
+  "images": ["https://..."],
+  "videos": ["https://..."]
+}
+```
+
 ## Use it
 
 Website (easiest):

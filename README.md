@@ -7,6 +7,10 @@ Paste an Ads Library URL, get every ad and advertiser with page name, page URL, 
 WhatsApp numbers, phones, emails, images, dates. Browse it in a local website, tick the ones you
 contacted (row turns gray), download Excel.
 
+## Result
+
+See [What the result looks like](HOW_IT_WORKS.md#what-the-result-looks-like) for the website, `leads.md`, `pages.json` and `ads.json` formats.
+
 ## Install
 
 ```
