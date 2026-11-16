@@ -71,6 +71,7 @@ def collections():
         meta["has_data"] = (d / "ads.json").exists()
         xl = d / f"{d.name}.xlsx"
         meta["xlsx"] = f"/files/{d.name}/{xl.name}" if xl.exists() else None
+        meta["leads"] = f"/files/{d.name}/leads.md" if (d / "leads.md").exists() else None
         out.append(meta)
     out.sort(key=lambda m: m.get("started") or "", reverse=True)
     return out
@@ -98,7 +99,8 @@ class Handler(SimpleHTTPRequestHandler):
         data = path.read_bytes()
         ctype = {"xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                  "csv": "text/csv; charset=utf-8", "json": "application/json; charset=utf-8",
-                 "log": "text/plain; charset=utf-8"}.get(path.suffix.lstrip("."), "application/octet-stream")
+                 "log": "text/plain; charset=utf-8",
+                 "md": "text/markdown; charset=utf-8"}.get(path.suffix.lstrip("."), "application/octet-stream")
         self.send_response(200)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Disposition", f'attachment; filename="{path.name}"')

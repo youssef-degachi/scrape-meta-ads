@@ -162,7 +162,7 @@ async function loadCollections() {
       <div><div class="title">${esc(c.name)} <span class="status ${st}">${st}</span></div>
         <div class="sub">${kw ? esc(kw) + (country ? ' · ' + esc(country) : '') + ' · ' : ''}${esc(c.started || '')}${st === 'running' && c.progress ? ' · ' + esc(c.progress) : ''}${c.error ? ' · ' + esc(c.error) : ''}</div></div>
       <div class="nums">${c.has_data ? `${c.pages ?? '?'} advertisers · ${c.ads ?? '?'} ads<br>WhatsApp ${c.ads_with_whatsapp ?? '-'} · phone ${c.ads_with_phone ?? '-'} · email ${c.ads_with_email ?? '-'}` : ''}</div>
-      <div>${c.xlsx ? `<a class="btn secondary" href="${esc(c.xlsx)}">⬇ Excel</a>` : ''}</div>
+      <div>${c.xlsx ? `<a class="btn secondary" href="${esc(c.xlsx)}">⬇ Excel</a>` : ''} ${c.leads ? `<a class="btn secondary" href="${esc(c.leads)}">⬇ Leads</a>` : ''}</div>
       <div>${c.has_data ? `<button class="btn open" data-name="${esc(c.name)}">Open</button>` : ''}</div>
     </div>`;
   }).join('');

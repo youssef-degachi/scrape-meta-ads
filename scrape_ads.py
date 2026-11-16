@@ -455,6 +455,7 @@ def write_csv(results, path):
 
 def write_xlsx(results, pages, path):
     from openpyxl import Workbook
+    from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
     from openpyxl.styles import Font, PatternFill, Alignment
     from openpyxl.utils import get_column_letter
 
@@ -463,8 +464,16 @@ def write_xlsx(results, pages, path):
         for c in ws[1]:
             c.font = Font(bold=True, color="FFFFFF")
             c.fill = PatternFill("solid", fgColor="1F4E78")
+        def cell(v):
+            if isinstance(v, list):
+                v = " | ".join(map(str, v))
+            if isinstance(v, str):
+                # Excel rejects control characters and cells longer than 32767 chars
+                v = ILLEGAL_CHARACTERS_RE.sub("", v)[:32000]
+            return v
+
         for r in rows:
-            ws.append([(" | ".join(map(str, r.get(k) or [])) if isinstance(r.get(k), list) else r.get(k)) for k in cols])
+            ws.append([cell(r.get(k)) for k in cols])
         for i, k in enumerate(cols, 1):
             width = max([len(str(k))] + [min(len(str(r.get(k) or "")), 60) for r in rows]) + 2
             ws.column_dimensions[get_column_letter(i)].width = min(width, 62)
@@ -518,6 +527,8 @@ def main():
     ap.add_argument("--idle-rounds", type=int, default=5,
                     help="stop after this many scrolls with no new ads")
     ap.add_argument("--debug-dir", help="dump raw GraphQL responses here")
+    ap.add_argument("--no-enrich", action="store_true",
+                    help="build leads.md from the ads only (skip reading Facebook pages and websites)")
     a = ap.parse_args()
 
     folder = None
@@ -549,12 +560,17 @@ def main():
         write_csv(results, folder / "ads.csv")
         write_csv(pages, folder / "pages.csv")
         write_xlsx(results, pages, folder / f"{folder.name}.xlsx")
+        try:
+            from leads import build_leads
+            build_leads(folder, enrich=not a.no_enrich, data_dir=a.data_dir)
+        except Exception as e:
+            print(f"[warn] leads.md not written: {e}", file=sys.stderr)
         m = json.loads((folder / "meta.json").read_text(encoding="utf-8"))
         m.update(status="done", finished=time.strftime("%Y-%m-%d %H:%M:%S"), ads=len(results),
                  pages=len(pages), ads_with_whatsapp=wa, ads_with_phone=ph, ads_with_email=em)
         (folder / "meta.json").write_text(json.dumps(m, ensure_ascii=False, indent=1), encoding="utf-8")
         print(f"\nDone. {len(results)} ads from {len(pages)} pages -> {folder}/  "
-              f"(ads.json, pages.json, ads.csv, pages.csv, {folder.name}.xlsx)")
+              f"(ads.json, pages.json, ads.csv, pages.csv, {folder.name}.xlsx, leads.md)")
     else:
         Path(a.out).write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
         pages_path = Path(a.out).with_suffix(".pages.json")
